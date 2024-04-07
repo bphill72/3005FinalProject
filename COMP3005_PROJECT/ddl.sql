@@ -1,3 +1,7 @@
+CREATE DATABASE comp3005_final;
+
+\c comp3005_final
+
 CREATE TABLE equipment (
        equipment_id SERIAL PRIMARY KEY,
        equipment_name TEXT NOT NULL,
