@@ -91,12 +91,12 @@ public class Main
                 
                 // Insert a profile for the new member
                 PreparedStatement profileStatement = connection.prepareStatement("INSERT INTO profiles (member_id, mem_weight, mem_height, user_name, user_pass) VALUES (?, ?, ?, ?, ?)");
-                // You can set default values or null for mem_weight, mem_height, user_name, user_pass if needed
+                
                 profileStatement.setInt(1, memberId);
-                profileStatement.setInt(2, weight); // Default weight
-                profileStatement.setInt(3, height); // Default height
-                profileStatement.setString(4, user); // Default username
-                profileStatement.setString(5, pass); // Default password
+                profileStatement.setInt(2, weight); 
+                profileStatement.setInt(3, height); 
+                profileStatement.setString(4, user); 
+                profileStatement.setString(5, pass); 
                 profileStatement.executeUpdate();
                 
                 System.out.println("Member registered successfully with member ID: " + memberId);
