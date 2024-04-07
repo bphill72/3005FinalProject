@@ -33,6 +33,7 @@ public class Main
 
     }
 
+    //function to get user input for new member
     public static void newMem(){
 
         Scanner scanner = new Scanner(System.in);
@@ -43,6 +44,7 @@ public class Main
         System.out.println("Enter last name:");
         String lastName = scanner.nextLine();
         
+        //set fee for new members
         int fee = 30;
         
         System.out.println("Enter registration date (yyyy-mm-dd):");
@@ -61,7 +63,7 @@ public class Main
         System.out.println("Enter password:");
         String password = scanner.next();
         
-        // Call the memberRegistration function with the collected inputs
+        // Call the function with data
         memberRegistration(firstName, lastName, fee, registrationDate, weight, height, username, password);
 
     }
@@ -69,34 +71,36 @@ public class Main
     //function for adding student to table
     public static void memberRegistration(String first_name, String last_name, int fee, Date registration_date, int weight, int height, String user, String pass) {
         try {
-            // Query statement sent to the database to insert member information and retrieve generated keys
+            // statement sent to db to create new member
             PreparedStatement statement = connection.prepareStatement("INSERT INTO members (first_name, last_name, fee, registration_date) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             
-            // Setting all the values
+            // setting all the values
             statement.setString(1, first_name);
             statement.setString(2, last_name);
             statement.setInt(3, fee);
             statement.setDate(4, registration_date);
             
-            // Execute the statement
+            // execute the statement
             int affectedRows = statement.executeUpdate();
+
+            //error checking
             if (affectedRows == 0) {
                 throw new SQLException("Creating member failed, no rows affected.");
             }
             
-            // Retrieve the generated member ID
+            //retrieve the generated member ID
             ResultSet generatedKeys = statement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 int memberId = generatedKeys.getInt(1);
                 
-                // Insert a profile for the new member
+                // create profile for member
                 PreparedStatement profileStatement = connection.prepareStatement("INSERT INTO profiles (member_id, mem_weight, mem_height, user_name, user_pass) VALUES (?, ?, ?, ?, ?)");
-                // You can set default values or null for mem_weight, mem_height, user_name, user_pass if needed
+                
                 profileStatement.setInt(1, memberId);
-                profileStatement.setInt(2, weight); // Default weight
-                profileStatement.setInt(3, height); // Default height
-                profileStatement.setString(4, user); // Default username
-                profileStatement.setString(5, pass); // Default password
+                profileStatement.setInt(2, weight); 
+                profileStatement.setInt(3, height); 
+                profileStatement.setString(4, user);
+                profileStatement.setString(5, pass); 
                 profileStatement.executeUpdate();
                 
                 System.out.println("Member registered successfully with member ID: " + memberId);
