@@ -112,4 +112,55 @@ public class Main
         }
     }
 
+    /*
+    //function to update profile weight and height, based on profile id provided
+    public static void updateProfile(Integer profile_id, Integer mem_weight, Integer mem_height, Integer goal_id, Integer goal_weight, Integer goal_reps, Integer goal_sets)
+    {
+
+        //try and catch for any errors
+        try
+        {
+            Class.forName("org.postgresql.Driver");
+
+            //connecting to db
+            Connection connection = DriverManager.getConnection(url, user, password);
+
+            //query for updating student email based on id
+            String updateQuery = "UPDATE profiles SET mem_weight = ?, mem_height = ? WHERE profile_id = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
+            preparedStatement.setInt(1, mem_weight);
+            preparedStatement.setInt(2, mem_height);
+            preparedStatement.setInt(3, profile_id);
+            int updatedRows = preparedStatement.executeUpdate();
+
+            String updateGoalQuery = "UPDATE goals SET goal_weight = ?, goal_reps = ?, goal_sets = ? WHERE profile_id = ? AND goal_id = ?";
+            PreparedStatement goalStatement = connection.prepareStatement(updateGoalQuery);
+            goalStatement.setInt(1, goal_weight);
+            goalStatement.setInt(2, goal_reps);
+            goalStatement.setInt(3, goal_sets);
+            goalStatement.setInt(4, profile_id);
+            goalStatement.setInt(5, goal_id);
+            int updatedGoalRows = goalStatement.executeUpdate();
+
+            //checking to see if profile and goal were updated
+            if (updatedRows > 0 && updatedGoalRows > 0)
+            {
+                System.out.println("Profile and Goal updated successfully.");
+            }
+
+            else
+            {
+                System.out.println("Profile with ID " + profile_id + " or Goal with ID " + goal_id + " not found.");
+            }
+        }
+
+        //catch any exception errors
+        catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    */
+
 }
