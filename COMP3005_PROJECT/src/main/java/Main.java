@@ -22,7 +22,8 @@ public class Main
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(url,user,password);
             
-            newMem();
+            //newMem();
+            dashboard(1);
             
 
         }
@@ -162,5 +163,55 @@ public class Main
         }
     }
     */
+
+
+    public static void dashboard(int memberId) {
+        try {
+            //get goals from the goals table using the profile id of the member id
+            PreparedStatement goalStatement = connection.prepareStatement("SELECT * FROM goals WHERE profile_id IN (SELECT profile_id FROM profiles WHERE member_id = ?)");
+            goalStatement.setInt(1, memberId);
+            ResultSet goalResultSet = goalStatement.executeQuery();
+            
+            //display exercise goals
+            System.out.println("Exercise, Goals, and Current Achieved:");
+            while (goalResultSet.next()) {
+                String exercise = goalResultSet.getString("exercise");
+                int goalWeight = goalResultSet.getInt("goal_weight");
+                int goalReps = goalResultSet.getInt("goal_reps");
+                int goalSets = goalResultSet.getInt("goal_sets");
+                int currentWeight = goalResultSet.getInt("current_weight");
+                int currentReps = goalResultSet.getInt("current_reps");
+                int currentSets = goalResultSet.getInt("current_sets");
+                
+                System.out.println("Exercise: " + exercise);
+                System.out.println("Goal Weight: " + goalWeight + " lbs");
+                System.out.println("Goal Reps: " + goalReps);
+                System.out.println("Goal Sets: " + goalSets);
+                System.out.println("Current Weight: " + currentWeight + " lbs");
+                System.out.println("Current Reps: " + currentReps);
+                System.out.println("Current Sets: " + currentSets);
+                System.out.println();
+            }
+            
+            //health statistics
+            PreparedStatement statisticsStatement = connection.prepareStatement("SELECT * FROM profiles WHERE member_id = ?");
+            statisticsStatement.setInt(1, memberId);
+            ResultSet statisticsResultSet = statisticsStatement.executeQuery();
+            
+            //display 
+            System.out.println("Health Statistics:");
+            while (statisticsResultSet.next()) {
+                int weight = statisticsResultSet.getInt("mem_weight");
+                int height = statisticsResultSet.getInt("mem_height");
+                System.out.println("Weight: " + weight + " lbs");
+                System.out.println("Height: " + height + " cm");
+                System.out.println();
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

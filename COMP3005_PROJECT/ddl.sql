@@ -70,8 +70,12 @@ CREATE TABLE sessions (
 CREATE TABLE goals (
    goal_id SERIAL PRIMARY KEY,
    profile_id INT NOT NULL,
+   exercise TEXT NOT NULL,
    goal_weight INTEGER NOT NULL,
    goal_reps INTEGER NOT NULL,
    goal_sets INTEGER NOT NULL,
+   current_weight INTEGER NOT NULL,
+   current_reps INTEGER NOT NULL,
+   current_sets INTEGER NOT NULL,
    FOREIGN KEY (profile_id) REFERENCES profiles(profile_id) ON DELETE CASCADE
 );
