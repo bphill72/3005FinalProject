@@ -82,27 +82,27 @@ public class Main
             statement.setDate(4, registration_date);
             
             // execute the statement
-            int affectedRows = statement.executeUpdate();
+            int rows = statement.executeUpdate();
 
             //error checking
-            if (affectedRows == 0) {
+            if (rows == 0) {
                 throw new SQLException("Creating member failed, no rows affected.");
             }
             
             //retrieve the generated member ID
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                int memberId = generatedKeys.getInt(1);
+            ResultSet pKeys = statement.getGeneratedKeys();
+            if (pKeys.next()) {
+                int memberId = pKeys.getInt(1);
                 
                 // create profile for member
-                PreparedStatement profileStatement = connection.prepareStatement("INSERT INTO profiles (member_id, mem_weight, mem_height, user_name, user_pass) VALUES (?, ?, ?, ?, ?)");
+                PreparedStatement pStatement = connection.prepareStatement("INSERT INTO profiles (member_id, mem_weight, mem_height, user_name, user_pass) VALUES (?, ?, ?, ?, ?)");
                 
-                profileStatement.setInt(1, memberId);
-                profileStatement.setInt(2, weight); 
-                profileStatement.setInt(3, height); 
-                profileStatement.setString(4, user);
-                profileStatement.setString(5, pass); 
-                profileStatement.executeUpdate();
+                pStatement.setInt(1, memberId);
+                pStatement.setInt(2, weight); 
+                pStatement.setInt(3, height); 
+                pStatement.setString(4, user);
+                pStatement.setString(5, pass); 
+                pStatement.executeUpdate();
                 
                 System.out.println("Member registered successfully with member ID: " + memberId);
             } else {
@@ -167,21 +167,37 @@ public class Main
 
     public static void dashboard(int memberId) {
         try {
+
+            //statement to get name of member
+            PreparedStatement nameState = connection.prepareStatement("SELECT first_name, last_name FROM members WHERE member_id = ?");
+            nameState.setInt(1, memberId);
+            ResultSet nameRS = nameState.executeQuery();
+            
+            String fname = "";
+            String lname = "";
+            if (nameRS.next()) {
+                fname = nameRS.getString("first_name");
+                lname = nameRS.getString("last_name");
+            }
+            
+            System.out.println("Dashboard for Member: " + fname + " " + lname);
+            System.out.println();
+
             //get goals from the goals table using the profile id of the member id
-            PreparedStatement goalStatement = connection.prepareStatement("SELECT * FROM goals WHERE profile_id IN (SELECT profile_id FROM profiles WHERE member_id = ?)");
-            goalStatement.setInt(1, memberId);
-            ResultSet goalResultSet = goalStatement.executeQuery();
+            PreparedStatement goalState = connection.prepareStatement("SELECT * FROM goals WHERE profile_id IN (SELECT profile_id FROM profiles WHERE member_id = ?)");
+            goalState.setInt(1, memberId);
+            ResultSet goalRS = goalState.executeQuery();
             
             //display exercise goals
             System.out.println("Exercise, Goals, and Current Achieved:");
-            while (goalResultSet.next()) {
-                String exercise = goalResultSet.getString("exercise");
-                int goalWeight = goalResultSet.getInt("goal_weight");
-                int goalReps = goalResultSet.getInt("goal_reps");
-                int goalSets = goalResultSet.getInt("goal_sets");
-                int currentWeight = goalResultSet.getInt("current_weight");
-                int currentReps = goalResultSet.getInt("current_reps");
-                int currentSets = goalResultSet.getInt("current_sets");
+            while (goalRS.next()) {
+                String exercise = goalRS.getString("exercise");
+                int goalWeight = goalRS.getInt("goal_weight");
+                int goalReps = goalRS.getInt("goal_reps");
+                int goalSets = goalRS.getInt("goal_sets");
+                int currentWeight = goalRS.getInt("current_weight");
+                int currentReps = goalRS.getInt("current_reps");
+                int currentSets = goalRS.getInt("current_sets");
                 
                 System.out.println("Exercise: " + exercise);
                 System.out.println("Goal Weight: " + goalWeight + " lbs");
@@ -194,15 +210,15 @@ public class Main
             }
             
             //health statistics
-            PreparedStatement statisticsStatement = connection.prepareStatement("SELECT * FROM profiles WHERE member_id = ?");
-            statisticsStatement.setInt(1, memberId);
-            ResultSet statisticsResultSet = statisticsStatement.executeQuery();
+            PreparedStatement statsState = connection.prepareStatement("SELECT * FROM profiles WHERE member_id = ?");
+            statsState.setInt(1, memberId);
+            ResultSet statsRS = statsState.executeQuery();
             
             //display 
             System.out.println("Health Statistics:");
-            while (statisticsResultSet.next()) {
-                int weight = statisticsResultSet.getInt("mem_weight");
-                int height = statisticsResultSet.getInt("mem_height");
+            while (statsRS.next()) {
+                int weight = statsRS.getInt("mem_weight");
+                int height = statsRS.getInt("mem_height");
                 System.out.println("Weight: " + weight + " lbs");
                 System.out.println("Height: " + height + " cm");
                 System.out.println();
