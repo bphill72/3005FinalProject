@@ -230,4 +230,121 @@ public class Main
     }
 
 
+    /*
+    public static void equipmentMaintenance(int equipment_id) {
+        try{
+            Statement statement = connection.createStatement();
+            String insertSQL = "UPDATE equipment SET last_maintained_date=? WHERE equipment_id=?";
+            // Creating a prepared statement for security
+            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+                pstmt.setInt(2, equipment_id);
+                pstmt.executeUpdate();
+                System.out.println("Updated the equipment's last maintained by date");
+                pstmt.close();
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {}
+    }
+
+    public static void trainerSchedule(int trainer_id) {
+        try{
+            Statement statement = connection.createStatement();
+            String insertSQL = "SELECT * FROM trainers WHERE trainer_id=?";
+            // Creating a prepared statement for security
+            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setInt(1, trainer_id);
+                pstmt.executeQuery();
+                System.out.println("Here are the trainer's availabilites: ");
+
+                ResultSet results = pstmt.getResultSet();
+
+                // Prints each attribute of a student seperated by a tab
+                while (results.next()) {
+                    System.out.print(results.getString("availability_id") + "\t");
+                    System.out.print(results.getString("trainer_id") + "\t");
+                    System.out.print(results.getString("start_time") + "\t");
+                    System.out.print(results.getString("end_time") + "\t");
+                    System.out.println(results.getString("week_day"));
+                }
+                results.close();
+
+                pstmt.close();
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+
+        } catch (SQLException e) {}
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Select the date you wish to change your availability for:");
+        System.out.println("[1] Sunday");
+        System.out.println("[2] Monday");
+        System.out.println("[3] Tuesday");
+        System.out.println("[4] Wednesday");
+        System.out.println("[5] Thursday");
+        System.out.println("[6] Friday");
+        System.out.println("[7] Saturday");
+        int day = scanner.nextInt();
+
+        String weekday = "";
+
+        switch (day) {
+            case 1:
+                weekday = "Sunday";
+                break;
+            case 2:
+                weekday = "Monday";
+                break;
+            case 3:
+                weekday = "Tuesday";
+                break;
+            case 4:
+                weekday = "Wednesday";
+                break;
+            case 5:
+                weekday = "Thursday";
+                break;
+            case 6:
+                weekday = "Friday";
+                break;
+            case 7:
+                weekday = "Saturday";
+                break;
+        }
+        updateTrainerSchedule(trainer_id, weekday);
+    }
+
+    public static void updateTrainerSchedule(int trainer_id, String weekday) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the new start time in the following format: (hh:mm)");
+        String start = scanner.nextLine();
+
+        System.out.println("Enter the new end time in the following format: (hh:mm)");
+        String end = scanner.nextLine();
+
+        try{
+            Statement statement = connection.createStatement();
+            String insertSQL = "UPDATE availability SET start_time=?, end_time=? WHERE trainer_id=? AND weekday=?";
+            // Creating a prepared statement for security
+            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setTime(1, new java.sql.Time(start));
+                pstmt.setTime(2, new java.sql.Time(end));
+                pstmt.setInt(3, trainer_id);
+                pstmt.setString(4, weekday);
+                pstmt.executeUpdate();
+                System.out.println("Updated the trainer's availability");
+                pstmt.close();
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {}
+    }
+     */
 }
