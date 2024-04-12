@@ -23,7 +23,7 @@ public class Main
             connection = DriverManager.getConnection(url,user,password);
             
             //newMem();
-            dashboard(1);
+            processBilling(1);
             
 
         }
@@ -34,8 +34,8 @@ public class Main
 
     }
 
-    //function to get user input for new member
-    public static void newMem(){
+   //function to get user input for new member
+   public static void newMem(){
 
         Scanner scanner = new Scanner(System.in);
         
@@ -48,9 +48,9 @@ public class Main
         //set fee for new members
         int fee = 30;
         
-        System.out.println("Enter registration date (yyyy-mm-dd):");
-        String registrationDateStr = scanner.next();
-        Date registrationDate = Date.valueOf(registrationDateStr);
+        System.out.println("Enter registration date int this format (yyyy-mm-dd):");
+        String regDateStr = scanner.next();
+        Date regDate = Date.valueOf(regDateStr);
         
         System.out.println("Enter weight:");
         int weight = scanner.nextInt();
@@ -65,7 +65,7 @@ public class Main
         String password = scanner.next();
         
         // Call the function with data
-        memberRegistration(firstName, lastName, fee, registrationDate, weight, height, username, password);
+        memberRegistration(firstName, lastName, fee, regDate, weight, height, username, password);
 
     }
 
@@ -103,14 +103,53 @@ public class Main
                 pStatement.setString(4, user);
                 pStatement.setString(5, pass); 
                 pStatement.executeUpdate();
+
+                //generate a bill for the new member
+                generateBill(memberId, fee, registration_date);
                 
-                System.out.println("Member registered successfully with member ID: " + memberId);
             } else {
                 throw new SQLException("Creating member failed, no ID obtained.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();   
+            System.out.println(e.getMessage());  
         }
+    }
+
+    // Function to generate a bill for a new member
+    private static void generateBill(int memberId, int amountOwed, Date regDate) {
+        try {
+            PreparedStatement billState = connection.prepareStatement("INSERT INTO billing (member_id, amount_owed, payment_date_due, payment_status) VALUES (?, ?, ?, ?)");
+            billState.setInt(1, memberId);
+            billState.setInt(2, amountOwed);
+            //payment date set to 1 month
+            billState.setDate(3, Date.valueOf(regDate.toLocalDate().plusMonths(1)));
+            billState.setString(4, "Unpaid");
+            billState.executeUpdate();
+            
+            System.out.println("Bill for member ID: " + memberId);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //function for getting user info for bill
+    public static void createBill() {
+    
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("Enter Member ID:");
+        int memId = scanner.nextInt();
+        
+        System.out.println("Enter Amount Owed:");
+        int fee = scanner.nextInt();
+        
+        System.out.println("Enter Payment Date Due in this format (YYYY-MM-DD):");
+        String paymentDate = scanner.next();
+        Date paymentDateDue = Date.valueOf(paymentDate);
+        generateBill(memId, fee, paymentDateDue);
+        
+        scanner.close();
+        
     }
 
     /*
@@ -164,7 +203,7 @@ public class Main
     }
     */
 
-
+    //function for displaying dashboard
     public static void dashboard(int memberId) {
         try {
 
@@ -225,7 +264,7 @@ public class Main
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -346,7 +385,78 @@ public class Main
             }
         } catch (SQLException e) {}
     }
-     */
+    */
+
+
+
+    //function for billing
+    public static void processBilling(int memberId) {
+        try {
+
+            //get billing information
+            PreparedStatement billingState = connection.prepareStatement("SELECT * FROM billing WHERE member_id = ?");
+            billingState.setInt(1, memberId);
+            ResultSet billingRS = billingState.executeQuery();
+            
+            //billing information
+            System.out.println("Billing Information:");
+            while (billingRS.next()) {
+                int billingId = billingRS.getInt("billing_id");
+                int amountOwed = billingRS.getInt("amount_owed");
+                String paymentDateDue = billingRS.getString("payment_date_due");
+                String paymentStatus = billingRS.getString("payment_status");
+                
+                System.out.println("Billing ID: " + billingId);
+                System.out.println("Amount Owed: $" + amountOwed);
+                System.out.println("Payment Date Due: " + paymentDateDue);
+                System.out.println("Payment Status: " + paymentStatus);
+                System.out.println();
+            }
+
+            boolean isBillPaid = billPaid(memberId);
+            
+            if (isBillPaid) {
+                System.out.println("Bill already paid.");
+                return;
+            }
+            
+            //payment processing
+            System.out.println("Payment processing");
+            updatePayment(memberId);
+            
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // simulate updating payment 
+    private static void updatePayment(int memberId) {
+        try {
+            PreparedStatement updateState = connection.prepareStatement("UPDATE billing SET payment_status = 'Paid' WHERE member_id = ?");
+            updateState.setInt(1, memberId);
+            updateState.executeUpdate();
+            System.out.println("Payment processed successfully for member ID: " + memberId);
+            } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //check if the bill is already paid
+    private static boolean billPaid(int memberId) {
+        try {
+            PreparedStatement billState = connection.prepareStatement("SELECT payment_status FROM billing WHERE member_id = ?");
+            billState.setInt(1, memberId);
+            ResultSet billRS = billState.executeQuery();
+            
+            if (billRS.next()) {
+                String paymentStatus = billRS.getString("payment_status");
+                return paymentStatus.equals("Paid");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false; 
+    }
 
     /*
     //function to add a session

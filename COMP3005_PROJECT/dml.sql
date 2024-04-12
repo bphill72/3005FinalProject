@@ -31,3 +31,8 @@ INSERT INTO goals (profile_id, exercise, goal_weight, goal_reps, goal_sets, curr
 (3, 'Bench Press', 175, 1, 1, 135, 5, 2),
 (3, 'Squat', 315, 2, 1, 275, 1, 1),
 (3, 'Deadlift', 275, 1, 1, 225, 1, 1);
+
+INSERT INTO billing (member_id, amount_owed, payment_date_due, payment_status) VALUES
+(1, 10, '2023-10-01', 'Unpaid'),
+(2, 20, '2023-10-01', 'Paid'),
+(3, 30, '2023-10-02', 'Unpaid');
