@@ -572,4 +572,38 @@ public class Main
     }
     
      */
+    public static void updateSession(int sessionId, int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity, int current)
+    {
+        try(Connection connection = DriverManager.getConnection(url, user, password))
+        {
+            String query = "UPDATE sessions SET room_id = ?, trainer_id = ?, start_time = ?, end_time = ?, week_day = ?, capacity = ?, current = ? WHERE session_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, roomId);
+            preparedStatement.setInt(2, trainerId);
+            preparedStatement.setTime(3, startTime);
+            preparedStatement.setTime(4, endTime);
+            preparedStatement.setString(5, weekDay);
+            preparedStatement.setInt(6, capacity);
+            preparedStatement.setInt(7, current);
+            preparedStatement.setInt(8, sessionId);
+            int rowsUpdated = preparedStatement.executeUpdate();
+
+            if (rowsUpdated > 0)
+            {
+                System.out.println("Schedule updated");
+            }
+
+            else
+            {
+                System.out.println("Schedule update failed");
+            }
+        }
+
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    /*
+    
 }
