@@ -572,6 +572,7 @@ public class Main
     }
     
      */
+    /*
     public static void updateSession(int sessionId, int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity, int current)
     {
         try(Connection connection = DriverManager.getConnection(url, user, password))
@@ -604,6 +605,6 @@ public class Main
             e.printStackTrace();
         }
     }
-    /*
+    */
     
 }
