@@ -347,4 +347,119 @@ public class Main
         } catch (SQLException e) {}
     }
      */
+
+    /*
+    //function to add a session
+    public static void addSession(int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity)
+    {
+        try (Connection connection = DriverManager.getConnection(url, user, password))
+        {
+            String query = "INSERT INTO sessions (room_id, trainer_id, start_time, end_time, week_day, capacity, current) VALUES (?, ?, ?, ?, ?, ?, 1)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, roomId);
+            preparedStatement.setInt(2, trainerId);
+            preparedStatement.setTime(3, startTime);
+            preparedStatement.setTime(4, endTime);
+            preparedStatement.setString(5, weekDay);
+            preparedStatement.setInt(6, capacity);
+            preparedStatement.executeUpdate();
+        }
+
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    //function to check if session that wants to be added collides with anything
+    public static boolean checkSessions(Time startTime, Time endTime, String weekDay)
+    {
+        try(Connection connection = DriverManager.getConnection(url, user, password))
+        {
+            String query = "SELECT COUNT(*) AS count FROM sessions WHERE week_day = ? AND ((start_time <= ? AND end_time >= ?) OR (start_time >= ? AND start_time < ?) OR (end_time > ? AND end_time <= ?))";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, weekDay);
+            preparedStatement.setTime(2, startTime);
+            preparedStatement.setTime(3, startTime);
+            preparedStatement.setTime(4, startTime);
+            preparedStatement.setTime(5, endTime);
+            preparedStatement.setTime(6, endTime);
+            preparedStatement.setTime(7, endTime);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next())
+            {
+                int count = resultSet.getInt("count");
+                return count > 0;
+            }
+        }
+
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
+    //funciton to print sessions not full
+    public static void printSessionsNotFull()
+    {
+        try(Connection connection = DriverManager.getConnection(url, user, password))
+        {
+            String query = "SELECT * FROM sessions WHERE current < capacity";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            System.out.println("Sessions Not Full:");
+
+            while (resultSet.next())
+            {
+                int sessionId = resultSet.getInt("session_id");
+                int roomId = resultSet.getInt("room_id");
+                int trainerId = resultSet.getInt("trainer_id");
+                String startTime = resultSet.getTime("start_time").toString();
+                String endTime = resultSet.getTime("end_time").toString();
+                String weekDay = resultSet.getString("week_day");
+                int capacity = resultSet.getInt("capacity");
+                int current = resultSet.getInt("current");
+
+                System.out.printf("Session ID: %d, Room ID: %d, Trainer ID: %d, Start Time: %s, End Time: %s, Week Day: %s, Capacity: %d, Current: %d%n",
+                        sessionId, roomId, trainerId, startTime, endTime, weekDay, capacity, current);
+            }
+        }
+
+        catch (SQLException e)
+
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    //function to increment group sessions 
+    public static void incrementSessionCurrent(int sessionId)
+    {
+        try (Connection connection = DriverManager.getConnection(url, user, password))
+        {
+            String query = "UPDATE sessions SET current = current + 1 WHERE session_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, sessionId);
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0)
+            {
+                System.out.println("Session incremented");
+            }
+
+            else
+            {
+                System.out.println("Failed to increment session");
+            }
+        }
+
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+     */
 }
