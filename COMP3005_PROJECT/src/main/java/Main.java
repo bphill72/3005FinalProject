@@ -606,5 +606,74 @@ public class Main
         }
     }
     */
+
+    /*
+    public static void updateSessionRoom(int sessionId, int newRoomId, Time startTime, Time endTime, String weekDay)
+    {
+        if(isRoomAvailable(newRoomId, startTime, endTime, weekDay))
+        {
+            try(Connection connection = DriverManager.getConnection(url, user, password))
+            {
+                String query = "UPDATE sessions SET room_id = ? WHERE session_id = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setInt(1, newRoomId);
+                preparedStatement.setInt(2, sessionId);
+                int rowsUpdated = preparedStatement.executeUpdate();
+
+                if (rowsUpdated > 0)
+                {
+                    System.out.println("Session room updated");
+                }
+
+                else
+                {
+                    System.out.println("Session room update failed");
+                }
+            }
+
+            catch(SQLException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        else
+        {
+            System.out.println("Room collides with time slot of another");
+        }
+    }
+
+    private static boolean isRoomAvailable(int roomId, Time startTime, Time endTime, String weekDay)
+    {
+        try(Connection connection = DriverManager.getConnection(url, user, password))
+        {
+            String query = "SELECT COUNT(*) AS count FROM sessions WHERE room_id = ? AND week_day = ? AND ((start_time <= ? AND end_time >= ?) OR (start_time >= ? AND start_time < ?) OR (end_time > ? AND end_time <= ?))";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, roomId);
+            preparedStatement.setString(2, weekDay);
+            preparedStatement.setTime(3, startTime);
+            preparedStatement.setTime(4, endTime);
+            preparedStatement.setTime(5, startTime);
+            preparedStatement.setTime(6, endTime);
+            preparedStatement.setTime(7, startTime);
+            preparedStatement.setTime(8, endTime);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next())
+            {
+                int count = resultSet.getInt("count");
+                return count == 0;
+            }
+
+        }
+
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    */
     
 }
