@@ -151,55 +151,60 @@ public class Main
     }
 
 
-    //function to update profile weight and height, based on profile id provided
-    public static void updateProfile(Integer profile_id, Integer mem_weight, Integer mem_height, Integer goal_id, Integer goal_weight, Integer goal_reps, Integer goal_sets)
-    {
-
-        //try and catch for any errors
-        try
-        {
+    public static void updateProfile(int profile_id, int mem_weight, int mem_height) {
+        try {
             Class.forName("org.postgresql.Driver");
-
-            //connecting to db
             Connection connection = DriverManager.getConnection(url, user, password);
-
-            //query for updating student email based on id
-            String updateQuery = "UPDATE profiles SET mem_weight = ?, mem_height = ? WHERE profile_id = ?";
-
-            PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
-            preparedStatement.setInt(1, mem_weight);
-            preparedStatement.setInt(2, mem_height);
-            preparedStatement.setInt(3, profile_id);
-            int updatedRows = preparedStatement.executeUpdate();
-
-            String updateGoalQuery = "UPDATE goals SET goal_weight = ?, goal_reps = ?, goal_sets = ? WHERE profile_id = ? AND goal_id = ?";
+    
+            String updateProfileQuery = "UPDATE profiles SET mem_weight = ?, mem_height = ? WHERE profile_id = ?";
+            PreparedStatement profileStatement = connection.prepareStatement(updateProfileQuery);
+            profileStatement.setInt(1, mem_weight);
+            profileStatement.setInt(2, mem_height);
+            profileStatement.setInt(3, profile_id);
+            int updatedProfileRows = profileStatement.executeUpdate();
+    
+            if (updatedProfileRows > 0) {
+                System.out.println("Profile updated successfully.");
+            } else {
+                System.out.println("Profile with ID " + profile_id + " not found.");
+            }
+    
+            profileStatement.close();
+            connection.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void updateGoals(int profile_id, String exercise, int goal_weight, int goal_reps, int goal_sets, int current_weight, int current_reps, int current_sets) {
+        try {
+            Class.forName("org.postgresql.Driver");
+            Connection connection = DriverManager.getConnection(url, user, password);
+    
+            String updateGoalQuery = "UPDATE goals SET goal_weight = ?, goal_reps = ?, goal_sets = ?, current_weight = ?, current_reps = ?, current_sets = ? WHERE profile_id = ? AND exercise = ?";
             PreparedStatement goalStatement = connection.prepareStatement(updateGoalQuery);
             goalStatement.setInt(1, goal_weight);
             goalStatement.setInt(2, goal_reps);
             goalStatement.setInt(3, goal_sets);
-            goalStatement.setInt(4, profile_id);
-            goalStatement.setInt(5, goal_id);
+            goalStatement.setInt(4, current_weight);
+            goalStatement.setInt(5, current_reps);
+            goalStatement.setInt(6, current_sets);
+            goalStatement.setInt(7, profile_id);
+            goalStatement.setString(8, exercise);
             int updatedGoalRows = goalStatement.executeUpdate();
-
-            //checking to see if profile and goal were updated
-            if (updatedRows > 0 && updatedGoalRows > 0)
-            {
-                System.out.println("Profile and Goal updated successfully.");
+    
+            if (updatedGoalRows > 0) {
+                System.out.println("Goals updated successfully.");
+            } else {
+                System.out.println("Goals for profile ID " + profile_id + " and exercise " + exercise + " not found.");
             }
-
-            else
-            {
-                System.out.println("Profile with ID " + profile_id + " or Goal with ID " + goal_id + " not found.");
-            }
-        }
-
-        //catch any exception errors
-        catch (SQLException | ClassNotFoundException e)
-        {
+    
+            goalStatement.close();
+            connection.close();
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
-
 
     //function for displaying dashboard
     public static void dashboard(int memberId) {
@@ -723,14 +728,13 @@ public class Main
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the member's login info in the following format:");
         System.out.println("username password");
-        // Getting all attributes from the same line
         String username = scanner.next();
         String password = scanner.next();
 
         try{
             Statement statement = connection.createStatement();
             String insertSQL = "SELECT * FROM profiles WHERE user_name=? AND user_pass=?";
-            // Creating a prepared statement for security
+            
             try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
                 pstmt.setString(1, username);
                 pstmt.setString(2, password);
@@ -738,7 +742,7 @@ public class Main
 
                 ResultSet results = pstmt.getResultSet();
 
-                // Gets the member id
+                
                 if(results.next()) {
                     int member_id = results.getInt("member_id");
                     int profile_id = results.getInt("profile_id");
@@ -767,6 +771,7 @@ public class Main
             switch (option) {
                 case 1:
                     newProfileInfo(profile_id);
+                    newGoals(profile_id);
                     break;
                 case 2:
                     dashboard(member_id);
@@ -785,42 +790,41 @@ public class Main
         System.out.println("weight height");
         int weight = scanner.nextInt();
         int height = scanner.nextInt();
-        newGoals(profile_id, weight, height);
+        updateProfile(profile_id, weight, height);
     }
-
-    public static void newGoals(int profile_id, int weight, int height) {
+    
+    public static void newGoals(int profile_id) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the member's new weight, reps, and set goals in the following format:");
+        System.out.println("Enter the exercise you want to update:");
+        String exercise = scanner.nextLine();
+    
+        //new weight, reps, and sets goals
+        System.out.println("Enter the member's new goals for weight, reps, and sets in the following format:");
         System.out.println("weight reps sets");
         int g_weight = scanner.nextInt();
-        int reps = scanner.nextInt();
-        int set = scanner.nextInt();
-        int goal_id = 0;
-
-        try{
-            Statement statement = connection.createStatement();
-            String insertSQL = "SELECT goal_id FROM goals WHERE profile_id=?";
-            // Creating a prepared statement for security
-            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
-                pstmt.setInt(1, profile_id);
-                pstmt.executeQuery();
-
-                ResultSet results = pstmt.getResultSet();
-
-                // Gets the goal id
-                results.next();
-                goal_id = results.getInt("goal_id");
-                results.close();
-                pstmt.close();
-                statement.close();
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        } catch (SQLException e) {}
-
-        updateProfile(profile_id, weight, height, goal_id, g_weight, reps, set);
-
+        int g_reps = scanner.nextInt();
+        int g_set = scanner.nextInt();
+    
+        try {
+            Class.forName("org.postgresql.Driver");
+            Connection connection = DriverManager.getConnection(url, user, password);
+    
+            //updated current stats
+            System.out.println("Enter the member's updated current weight, reps, and sets in the following format:");
+            System.out.println("current weight current reps current sets");
+            int c_weight = scanner.nextInt();
+            int c_reps = scanner.nextInt();
+            int c_sets = scanner.nextInt();
+    
+            // Update goals 
+            updateGoals(profile_id, exercise, g_weight, g_reps, g_set, c_weight, c_reps, c_sets);
+    
+            connection.close(); 
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
+
 
     public static void trainerFunctions() {
         Scanner scanner = new Scanner(System.in);
