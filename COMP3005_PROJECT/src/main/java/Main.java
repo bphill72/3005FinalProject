@@ -148,8 +148,6 @@ public class Main
         Date paymentDateDue = Date.valueOf(paymentDate);
         generateBill(memId, fee, paymentDateDue);
         
-        scanner.close();
-        
     }
 
 
@@ -903,9 +901,24 @@ public class Main
                     break;
                 case 4:
                     //billing and payment
-                    System.out.println("Input the id of the member to bill:");
-                    int member_id = scanner.nextInt();
-                    processBilling(member_id);
+                    System.out.println("Select one of the following options:");
+                    System.out.println("[1] Bill Payment");
+                    System.out.println("[2] Generate New Bill");
+
+                    int option1 = scanner.nextInt();
+                    switch (option1) {
+
+                        case 1:
+                            System.out.println("Input the id of the member to bill:");
+                            int member_id = scanner.nextInt();
+                            processBilling(member_id);
+                            break;
+                        
+                        case 2:
+                            createBill();
+                            break;
+
+                    }
                     break;
             }
         }
