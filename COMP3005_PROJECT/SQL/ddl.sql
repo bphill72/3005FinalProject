@@ -1,6 +1,6 @@
-CREATE DATABASE comp3005_final;
+CREATE DATABASE project_db;
 
-\c comp3005_final
+\c project_db
 
 CREATE TABLE equipment (
        equipment_id SERIAL PRIMARY KEY,

@@ -1,4 +1,4 @@
-\c comp3005_final
+\c project_db
 
 INSERT INTO members (first_name, last_name, fee, registration_date) VALUES
 ('John', 'Doe', '10', '2023-09-01'),
