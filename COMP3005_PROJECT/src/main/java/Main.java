@@ -770,16 +770,29 @@ public class Main
             option = scanner.nextInt();
             switch (option) {
                 case 1:
-                    newProfileInfo(profile_id);
-                    newGoals(profile_id);
+                    System.out.println("Select one of the following options:");
+                    System.out.println("[1] Update Profile info");
+                    System.out.println("[2] Update Goals and Current Stats");
+                    int profileOption = scanner.nextInt();
+                    switch (profileOption) {
+                        case 1:
+                            newProfileInfo(profile_id);
+                            break;
+                        case 2:
+                            newGoals(profile_id);
+                            break;
+                        default:
+                            System.out.println("Invalid option. Please try again.");
+                    }
                     break;
                 case 2:
                     dashboard(member_id);
                     break;
                 case 3:
                     //schedule management
-
                     break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
             }
         }
     }
