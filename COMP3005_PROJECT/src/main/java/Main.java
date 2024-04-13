@@ -781,6 +781,7 @@ public class Main
                         case 2:
                             newGoals(profile_id);
                             break;
+
                         default:
                             System.out.println("Invalid option. Please try again.");
                     }
@@ -789,7 +790,8 @@ public class Main
                     dashboard(member_id);
                     break;
                 case 3:
-                    //schedule management
+                    System.out.println("got to here");
+                    memberScheduling();
                     break;
                 default:
                     System.out.println("Invalid option. Please try again.");
@@ -984,11 +986,11 @@ public class Main
 
         System.out.println("Enter the session id of the session you would like to update:");
         int session_id = scanner.nextInt();
-        System.out.println("Enter the new start and end times and day you would like to reschdule to:");
+        System.out.println("Enter the new start and end times and day you would like to reschedule to:");
         System.out.println("day hh:mm hh:mm");
         String day = scanner.next();
-        String start = scanner.next();
-        String end = scanner.next();
+        String start = scanner.next() +":00";
+        String end = scanner.next() +":00";
         Time start_time = Time.valueOf(start);
         Time end_time = Time.valueOf(end);
 
@@ -1025,8 +1027,9 @@ public class Main
         System.out.println("Enter the start and end times and day you would like to schedule for:");
         System.out.println("day hh:mm hh:mm");
         String day = scanner.next();
-        String start = scanner.next();
-        String end = scanner.next();
+        String start = scanner.next() +":00";
+        String end = scanner.next() +":00";
+
         Time start_time = Time.valueOf(start);
         Time end_time = Time.valueOf(end);
 
