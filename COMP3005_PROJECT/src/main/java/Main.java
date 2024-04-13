@@ -675,5 +675,149 @@ public class Main
         return false;
     }
     */
-    
+
+
+    public static void mainMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+        while(option != 0) {
+            System.out.println("Select one of the following options:");
+            System.out.println("[1] Member functions");
+            System.out.println("[2] Trainer functions");
+            System.out.println("[3] Admin functions");
+            System.out.println("[0] Quit");
+            option = scanner.nextInt();
+            switch (option) {
+                case 1:
+                    memberAccess();
+                    break;
+                case 2:
+                    //trainerFuntions();
+                    break;
+                case 3:
+                    //staffFuntions();
+                    break;
+            }
+        }
+    }
+
+    public static void memberAccess() {
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+        while(option != 0) {
+            System.out.println("Select one of the following options:");
+            System.out.println("[1] Login");
+            System.out.println("[2] Register");
+            System.out.println("[0] Quit");
+            option = scanner.nextInt();
+            switch (option) {
+                case 1:
+                    login();
+                    break;
+                case 2:
+                    newMem();
+                    break;
+            }
+        }
+    }
+
+    public static void login() {
+        Scanner myObj = new Scanner(System.in);
+        System.out.println("Enter the member's login info in the following format:");
+        System.out.println("username password");
+        // Getting all attributes from the same line
+        String username = scanner.next();
+        String password = scanner.next();
+
+        try{
+            Statement statement = connection.createStatement();
+            String insertSQL = "SELECT * FROM profiles WHERE user_name=? AND user_pass=?";
+            // Creating a prepared statement for security
+            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+                pstmt.executeQuery();
+
+                ResultSet results = pstmt.getResultSet();
+
+                // Gets the member id
+                results.next();
+                int member_id = results.getInt("member_id");
+                int profile_id = results.getInt("profile_id");
+                results.close();
+                pstmt.close();
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {}
+
+        memberFunctions(member_id, profile_id);
+    }
+
+    public static void memberFunctions(int member_id, int profile_id) {
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+        while (option != 0) {
+            System.out.println("Select one of the following options:");
+            System.out.println("[1] Profile Management");
+            System.out.println("[2] Dashboard Display");
+            System.out.println("[3] Schedule Management");
+            System.out.println("[0] Logout");
+            option = scanner.nextInt();
+            switch (option) {
+                case 1:
+                    newProfileInfo(profile_id);
+                    break;
+                case 2:
+                    dashboard(memberId);
+                    break;
+                case 3:
+                    //schedule management
+                    break;
+            }
+        }
+    }
+
+    public static void newProfileInfo(int profile_id) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the member's new weight and height in the following format:");
+        System.out.println("weight height");
+        int weight = scanner.nextInt();
+        int height = scanner.nextInt();
+        newGoals(rofile_id, weight, height);
+    }
+
+    public static void newGoals(int profile_id, int weight, int height) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the member's new weight, reps, and set goals in the following format:");
+        System.out.println("weight reps sets");
+        int g_weight = scanner.nextInt();
+        int reps = scanner.nextInt();
+        int set = scanner.nextInt();
+
+        try{
+            Statement statement = connection.createStatement();
+            String insertSQL = "SELECT goal_id FROM goals WHERE profile_id=?";
+            // Creating a prepared statement for security
+            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setInt(1, profile_id);
+                pstmt.executeQuery();
+
+                ResultSet results = pstmt.getResultSet();
+
+                // Gets the goal id
+                results.next();
+                int goal_id = results.getInt("goal_id");
+                results.close();
+                pstmt.close();
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {}
+
+        updateProfile(profile_id, weight, height, goal_id, g_weight, reps, sets);
+
+    }
 }
