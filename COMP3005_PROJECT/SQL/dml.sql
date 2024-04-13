@@ -36,3 +36,42 @@ INSERT INTO billing (member_id, amount_owed, payment_date_due, payment_status) V
 (1, 10, '2023-10-01', 'Unpaid'),
 (2, 20, '2023-10-01', 'Paid'),
 (3, 30, '2023-10-02', 'Unpaid');
+
+INSERT INTO sessions (room_id, trainer_id, start_time, end_time, week_day, capacity, current) VALUES
+(1, 1, '08:00', '09:00', 'Monday', 10, 5),
+(2, 2, '10:00', '11:00', 'Tuesday', 15, 8),
+(3, 3, '12:00', '13:00', 'Friday', 20, 10);
+
+INSERT INTO rooms (room_capacity) VALUES
+(10),
+(15),
+(20);
+
+INSERT INTO trainers (first_name, last_name) VALUES
+('Michael', 'Jordan'),
+('Lebron', 'James'),
+('Haroon', 'Rashid');
+
+INSERT INTO availability (trainer_id, start_time, end_time, week_day) 
+VALUES
+(1, '00:00', '23:59', 'Monday'),
+(1, '00:00', '23:59', 'Tuesday'),
+(1, '00:00', '23:59', 'Wednesday'),
+(1, '00:00', '23:59', 'Thursday'),
+(1, '00:00', '23:59', 'Friday'),
+(1, '00:00', '23:59', 'Saturday'),
+(1, '00:00', '23:59', 'Sunday'),
+(2, '00:00', '23:59', 'Monday'),
+(2, '00:00', '23:59', 'Tuesday'),
+(2, '00:00', '23:59', 'Wednesday'),
+(2, '00:00', '23:59', 'Thursday'),
+(2, '00:00', '23:59', 'Friday'),
+(2, '00:00', '23:59', 'Saturday'),
+(2, '00:00', '23:59', 'Sunday'),
+(3, '00:00', '23:59', 'Monday'),
+(3, '00:00', '23:59', 'Tuesday'),
+(3, '00:00', '23:59', 'Wednesday'),
+(3, '00:00', '23:59', 'Thursday'),
+(3, '00:00', '23:59', 'Friday'),
+(3, '00:00', '23:59', 'Saturday'),
+(3, '00:00', '23:59', 'Sunday');
