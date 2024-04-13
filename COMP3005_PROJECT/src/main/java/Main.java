@@ -936,7 +936,7 @@ public class Main
                 results.next();
                 start_time = results.getTime("start_time");
                 end_time = results.getTime("end_time");
-                weekday = results.getString("weekday");
+                weekday = results.getString("week_day");
                 results.close();
                 pstmt.close();
                 statement.close();
