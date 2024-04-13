@@ -23,7 +23,7 @@ public class Main
             connection = DriverManager.getConnection(url,user,password);
             
             //newMem();
-            processBilling(1);
+            mainMenu();
             
 
         }
@@ -462,23 +462,26 @@ public class Main
     //function to add a session
     public static void addSession(int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity)
     {
-        try (Connection connection = DriverManager.getConnection(url, user, password))
-        {
-            String query = "INSERT INTO sessions (room_id, trainer_id, start_time, end_time, week_day, capacity, current) VALUES (?, ?, ?, ?, ?, ?, 1)";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, roomId);
-            preparedStatement.setInt(2, trainerId);
-            preparedStatement.setTime(3, startTime);
-            preparedStatement.setTime(4, endTime);
-            preparedStatement.setString(5, weekDay);
-            preparedStatement.setInt(6, capacity);
-            preparedStatement.executeUpdate();
+        if(!checkSessions(startTime, endTime, weekDay)) {
+            try (Connection connection = DriverManager.getConnection(url, user, password))
+            {
+                String query = "INSERT INTO sessions (room_id, trainer_id, start_time, end_time, week_day, capacity, current) VALUES (?, ?, ?, ?, ?, ?, 1)";
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setInt(1, roomId);
+                preparedStatement.setInt(2, trainerId);
+                preparedStatement.setTime(3, startTime);
+                preparedStatement.setTime(4, endTime);
+                preparedStatement.setString(5, weekDay);
+                preparedStatement.setInt(6, capacity);
+                preparedStatement.executeUpdate();
+            }
+
+            catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
         }
 
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
     }
     
     //function to check if session that wants to be added collides with anything
@@ -573,20 +576,16 @@ public class Main
     
 
 
-    public static void updateSession(int sessionId, int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity, int current)
+    public static void updateSession(int sessionId, Time startTime, Time endTime, String weekDay)
     {
         try(Connection connection = DriverManager.getConnection(url, user, password))
         {
-            String query = "UPDATE sessions SET room_id = ?, trainer_id = ?, start_time = ?, end_time = ?, week_day = ?, capacity = ?, current = ? WHERE session_id = ?";
+            String query = "UPDATE sessions SET start_time = ?, end_time = ?, week_day = ? WHERE session_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, roomId);
-            preparedStatement.setInt(2, trainerId);
-            preparedStatement.setTime(3, startTime);
-            preparedStatement.setTime(4, endTime);
-            preparedStatement.setString(5, weekDay);
-            preparedStatement.setInt(6, capacity);
-            preparedStatement.setInt(7, current);
-            preparedStatement.setInt(8, sessionId);
+            preparedStatement.setTime(1, startTime);
+            preparedStatement.setTime(2, endTime);
+            preparedStatement.setString(3, weekDay);
+            preparedStatement.setInt(4, sessionId);
             int rowsUpdated = preparedStatement.executeUpdate();
 
             if (rowsUpdated > 0)
@@ -695,7 +694,7 @@ public class Main
                     trainerFuntions();
                     break;
                 case 3:
-                    //staffFuntions();
+                    adminFunctions();
                     break;
             }
         }
@@ -741,18 +740,19 @@ public class Main
                 ResultSet results = pstmt.getResultSet();
 
                 // Gets the member id
-                results.next();
-                int member_id = results.getInt("member_id");
-                int profile_id = results.getInt("profile_id");
-                results.close();
-                pstmt.close();
-                statement.close();
+                if(results.next()) {
+                    int member_id = results.getInt("member_id");
+                    int profile_id = results.getInt("profile_id");
+                    results.close();
+                    pstmt.close();
+                    statement.close();
+                    memberFunctions(member_id, profile_id);
+                }
+
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
         } catch (SQLException e) {}
-
-        memberFunctions(member_id, profile_id);
     }
 
     public static void memberFunctions(int member_id, int profile_id) {
@@ -774,6 +774,7 @@ public class Main
                     break;
                 case 3:
                     //schedule management
+
                     break;
             }
         }
@@ -894,7 +895,7 @@ public class Main
                     break;
                 case 3:
                     //class schedule management
-
+                    adminSessions();
                     break;
                 case 4:
                     //billing and payment
@@ -939,4 +940,68 @@ public class Main
         updateSessionRoom(session_id, room_id, start_time, end_time, weekday);
 
     }
+
+    public static void adminSessions() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter the session id of the session you would like to update:");
+        int session_id = scanner.nextInt();
+        System.out.println("Enter the new start and end times and day you would like to reschdule to:");
+        System.out.println("day hh:mm hh:mm");
+        String day = scanner.next();
+        String start = scanner.next();
+        String end = scanner.next();
+        Time start_time = Time.valueOf(start);
+        Time end_time = Time.valueOf(end);
+
+        updateSession(session_id, start_time, end_time, day);
+    }
+
+    public static void memberScheduling() {
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+        while(option != 0) {
+            System.out.println("Select one of the following options:");
+            System.out.println("[1] Book a session with a trainer");
+            System.out.println("[2] Register for a class");
+            System.out.println("[0] Return to Member Menu");
+            option = scanner.nextInt();
+            switch (option) {
+                case 1:
+                    getSessionBookingInfo();
+                    break;
+                case 2:
+                    classScheduling();
+                    break;
+            }
+        }
+    }
+
+    public static void getSessionBookingInfo() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the id of the room and trainer you would like to book:");
+        System.out.println("room_id trainer_id");
+        int room_id = scanner.nextInt();
+        int trainer_id = scanner.nextInt();
+
+        System.out.println("Enter the start and end times and day you would like to schedule for:");
+        System.out.println("day hh:mm hh:mm");
+        String day = scanner.next();
+        String start = scanner.next();
+        String end = scanner.next();
+        Time start_time = Time.valueOf(start);
+        Time end_time = Time.valueOf(end);
+
+        addSession(room_id, trainer_id, start, end, day, 1);
+    }
+
+    public static void classScheduling() {
+        printSessionsNotFull();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the id of the session you would like to join:");
+        int session_id = scanner.nextInt();
+
+        incrementSessionCurrent(session_id);
+    }
+
 }
