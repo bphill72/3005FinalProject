@@ -37,11 +37,6 @@ INSERT INTO billing (member_id, amount_owed, payment_date_due, payment_status) V
 (2, 20, '2023-10-01', 'Paid'),
 (3, 30, '2023-10-02', 'Unpaid');
 
-INSERT INTO sessions (room_id, trainer_id, start_time, end_time, week_day, capacity, current) VALUES
-(1, 1, '08:00', '09:00', 'Monday', 10, 5),
-(2, 2, '10:00', '11:00', 'Tuesday', 15, 8),
-(3, 3, '12:00', '13:00', 'Friday', 20, 10);
-
 INSERT INTO rooms (room_capacity) VALUES
 (10),
 (15),
@@ -51,6 +46,11 @@ INSERT INTO trainers (first_name, last_name) VALUES
 ('Michael', 'Jordan'),
 ('Lebron', 'James'),
 ('Haroon', 'Rashid');
+
+INSERT INTO sessions (room_id, trainer_id, start_time, end_time, week_day, capacity, current) VALUES
+(1, 1, '08:00', '09:00', 'Monday', 10, 5),
+(2, 2, '10:00', '11:00', 'Tuesday', 15, 8),
+(3, 3, '12:00', '13:00', 'Friday', 20, 10);
 
 INSERT INTO availability (trainer_id, start_time, end_time, week_day) 
 VALUES
