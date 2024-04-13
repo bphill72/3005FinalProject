@@ -820,4 +820,53 @@ public class Main
         updateProfile(profile_id, weight, height, goal_id, g_weight, reps, sets);
 
     }
+
+    public static void trainerFunctions() {
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+        while(option != 0) {
+            System.out.println("Select one of the following options:");
+            System.out.println("[1] Schedule Management");
+            System.out.println("[2] Member Profile Viewing");
+            System.out.println("[0] Return to Main Menu");
+            option = scanner.nextInt();
+            switch (option) {
+                case 1:
+                    System.out.println("Input the trainer's id:");
+                    int trainer_id = scanner.nextInt();
+                    trainerSchedule(trainer_id);
+                    break;
+                case 2:
+                    System.out.println("Input the member's name in the following format:");
+                    System.out.println("first_name last_name");
+                    String fname = scanner.next();
+                    String lname = scanner.next();
+
+                    try{
+                        Statement statement = connection.createStatement();
+                        String insertSQL = "SELECT member_id FROM members WHERE first_name=? AND last_name=?";
+                        // Creating a prepared statement for security
+                        try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                            pstmt.setString(1, fname);
+                            pstmt.setString(2, lname);
+                            pstmt.executeQuery();
+
+                            ResultSet results = pstmt.getResultSet();
+
+                            // Gets the member id
+                            results.next();
+                            int member_id = results.getInt("member_id");
+                            results.close();
+                            pstmt.close();
+                            statement.close();
+                        } catch (SQLException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    } catch (SQLException e) {}
+
+                    dashboard(int member_id);
+                    break;
+            }
+        }
+    }
 }
