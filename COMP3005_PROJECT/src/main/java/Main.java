@@ -360,30 +360,31 @@ public class Main
 
     public static void updateTrainerSchedule(int trainer_id, String weekday) {
         Scanner scanner = new Scanner(System.in);
-
+    
         System.out.println("Enter the new start time in the following format: (hh:mm)");
         String start = scanner.nextLine();
-
+    
         System.out.println("Enter the new end time in the following format: (hh:mm)");
         String end = scanner.nextLine();
-
-        try{
-            Statement statement = connection.createStatement();
-            String insertSQL = "UPDATE availability SET start_time=?, end_time=? WHERE trainer_id=? AND weekday=?";
-            // Creating a prepared statement for security
-            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
-                pstmt.setTime(1, new java.sql.Time(start));
-                pstmt.setTime(2, new java.sql.Time(end));
+    
+        try {
+            //parsing input
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+            java.util.Date parsedStartTime = format.parse(start);
+            java.util.Date parsedEndTime = format.parse(end);
+            Time startTime = new Time(parsedStartTime.getTime());
+            Time endTime = new Time(parsedEndTime.getTime());
+    
+            String updateSQL = "UPDATE availability SET start_time=?, end_time=? WHERE trainer_id=? AND week_day=?";
+            try (PreparedStatement pstmt = connection.prepareStatement(updateSQL)) {
+                pstmt.setTime(1, startTime);
+                pstmt.setTime(2, endTime);
                 pstmt.setInt(3, trainer_id);
                 pstmt.setString(4, weekday);
                 pstmt.executeUpdate();
                 System.out.println("Updated the trainer's availability");
-                pstmt.close();
-                statement.close();
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
             }
-        } catch (SQLException e) {}
+        } catch (ParseException | SQLException e) {}
     }
 
 
@@ -691,7 +692,7 @@ public class Main
                     memberAccess();
                     break;
                 case 2:
-                    trainerFuntions();
+                    trainerFunctions();
                     break;
                 case 3:
                     adminFunctions();
@@ -721,7 +722,7 @@ public class Main
     }
 
     public static void login() {
-        Scanner myObj = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the member's login info in the following format:");
         System.out.println("username password");
         // Getting all attributes from the same line
@@ -770,7 +771,7 @@ public class Main
                     newProfileInfo(profile_id);
                     break;
                 case 2:
-                    dashboard(memberId);
+                    dashboard(member_id);
                     break;
                 case 3:
                     //schedule management
@@ -786,7 +787,7 @@ public class Main
         System.out.println("weight height");
         int weight = scanner.nextInt();
         int height = scanner.nextInt();
-        newGoals(rofile_id, weight, height);
+        newGoals(profile_id, weight, height);
     }
 
     public static void newGoals(int profile_id, int weight, int height) {
@@ -796,6 +797,7 @@ public class Main
         int g_weight = scanner.nextInt();
         int reps = scanner.nextInt();
         int set = scanner.nextInt();
+        int goal_id = 0;
 
         try{
             Statement statement = connection.createStatement();
@@ -809,7 +811,7 @@ public class Main
 
                 // Gets the goal id
                 results.next();
-                int goal_id = results.getInt("goal_id");
+                goal_id = results.getInt("goal_id");
                 results.close();
                 pstmt.close();
                 statement.close();
@@ -818,7 +820,7 @@ public class Main
             }
         } catch (SQLException e) {}
 
-        updateProfile(profile_id, weight, height, goal_id, g_weight, reps, sets);
+        updateProfile(profile_id, weight, height, goal_id, g_weight, reps, set);
 
     }
 
@@ -842,10 +844,12 @@ public class Main
                     System.out.println("first_name last_name");
                     String fname = scanner.next();
                     String lname = scanner.next();
+                    int member_id = 0;
 
                     try{
                         Statement statement = connection.createStatement();
                         String insertSQL = "SELECT member_id FROM members WHERE first_name=? AND last_name=?";
+                        
                         // Creating a prepared statement for security
                         try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
                             pstmt.setString(1, fname);
@@ -856,7 +860,7 @@ public class Main
 
                             // Gets the member id
                             results.next();
-                            int member_id = results.getInt("member_id");
+                            member_id = results.getInt("member_id");
                             results.close();
                             pstmt.close();
                             statement.close();
@@ -865,7 +869,7 @@ public class Main
                         }
                     } catch (SQLException e) {}
 
-                    dashboard(int member_id);
+                    dashboard(member_id);
                     break;
             }
         }
@@ -913,10 +917,14 @@ public class Main
         int session_id = scanner.nextInt();
         System.out.println("Enter the room id of the room you would like to update to:");
         int room_id = scanner.nextInt();
+        Time start_time = null;
+        Time end_time = null;
+        String weekday = "";
 
         try{
             Statement statement = connection.createStatement();
             String insertSQL = "SELECT * FROM sessions WHERE session_id=?";
+            
             // Creating a prepared statement for security
             try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
                 pstmt.setInt(1, session_id);
@@ -926,9 +934,9 @@ public class Main
 
                 // Gets the member id
                 results.next();
-                Time start_time = results.getTime("start_time");
-                Time end_time = results.getTime("end_time");
-                String weekday = results.getString("weekday");
+                start_time = results.getTime("start_time");
+                end_time = results.getTime("end_time");
+                weekday = results.getString("weekday");
                 results.close();
                 pstmt.close();
                 statement.close();
@@ -992,7 +1000,7 @@ public class Main
         Time start_time = Time.valueOf(start);
         Time end_time = Time.valueOf(end);
 
-        addSession(room_id, trainer_id, start, end, day, 1);
+        addSession(room_id, trainer_id, start_time, end_time, day, 1);
     }
 
     public static void classScheduling() {
