@@ -152,7 +152,7 @@ public class Main
         
     }
 
-    /*
+
     //function to update profile weight and height, based on profile id provided
     public static void updateProfile(Integer profile_id, Integer mem_weight, Integer mem_height, Integer goal_id, Integer goal_weight, Integer goal_reps, Integer goal_sets)
     {
@@ -201,7 +201,7 @@ public class Main
             e.printStackTrace();
         }
     }
-    */
+
 
     //function for displaying dashboard
     public static void dashboard(int memberId) {
@@ -269,7 +269,7 @@ public class Main
     }
 
 
-    /*
+
     public static void equipmentMaintenance(int equipment_id) {
         try{
             Statement statement = connection.createStatement();
@@ -385,7 +385,7 @@ public class Main
             }
         } catch (SQLException e) {}
     }
-    */
+
 
 
 
@@ -458,7 +458,7 @@ public class Main
         return false; 
     }
 
-    /*
+
     //function to add a session
     public static void addSession(int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity)
     {
@@ -571,8 +571,8 @@ public class Main
         }
     }
     
-     */
-    /*
+
+
     public static void updateSession(int sessionId, int roomId, int trainerId, Time startTime, Time endTime, String weekDay, int capacity, int current)
     {
         try(Connection connection = DriverManager.getConnection(url, user, password))
@@ -605,9 +605,9 @@ public class Main
             e.printStackTrace();
         }
     }
-    */
 
-    /*
+
+
     public static void updateSessionRoom(int sessionId, int newRoomId, Time startTime, Time endTime, String weekDay)
     {
         if(isRoomAvailable(newRoomId, startTime, endTime, weekDay))
@@ -674,7 +674,7 @@ public class Main
 
         return false;
     }
-    */
+
 
 
     public static void mainMenu() {
@@ -692,7 +692,7 @@ public class Main
                     memberAccess();
                     break;
                 case 2:
-                    //trainerFuntions();
+                    trainerFuntions();
                     break;
                 case 3:
                     //staffFuntions();
@@ -868,5 +868,75 @@ public class Main
                     break;
             }
         }
+    }
+
+    public static void adminFunctions() {
+        Scanner scanner = new Scanner(System.in);
+        int option = -1;
+        while(option != 0) {
+            System.out.println("Select one of the following options:");
+            System.out.println("[1] Room Booking Management");
+            System.out.println("[2] Equipment Maintenance Monitoring");
+            System.out.println("[3] Class Schedule Updating");
+            System.out.println("[4] Billing and Payment Processin");
+            System.out.println("[0] Return to Main Menu");
+            option = scanner.nextInt();
+            switch (option) {
+                case 1:
+                    // room booking
+                    getRoomBookingInfo();
+                    break;
+                case 2:
+                    // equipment maintenance
+                    System.out.println("Input the id of the equipment to be maintained:");
+                    int equipment_id = scanner.nextInt();
+                    equipmentMaintenance(equipment_id);
+                    break;
+                case 3:
+                    //class schedule management
+
+                    break;
+                case 4:
+                    //billing and payment
+                    System.out.println("Input the id of the member to bill:");
+                    int member_id = scanner.nextInt();
+                    processBilling(member_id);
+                    break;
+            }
+        }
+    }
+
+    public static void getRoomBookingInfo() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the session id of the session you would like to update:");
+        int session_id = scanner.nextInt();
+        System.out.println("Enter the room id of the room you would like to update to:");
+        int room_id = scanner.nextInt();
+
+        try{
+            Statement statement = connection.createStatement();
+            String insertSQL = "SELECT * FROM sessions WHERE session_id=?";
+            // Creating a prepared statement for security
+            try(PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setInt(1, session_id);
+                pstmt.executeQuery();
+
+                ResultSet results = pstmt.getResultSet();
+
+                // Gets the member id
+                results.next();
+                Time start_time = results.getTime("start_time");
+                Time end_time = results.getTime("end_time");
+                String weekday = results.getString("weekday");
+                results.close();
+                pstmt.close();
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {}
+
+        updateSessionRoom(session_id, room_id, start_time, end_time, weekday);
+
     }
 }
