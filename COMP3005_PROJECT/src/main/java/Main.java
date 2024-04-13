@@ -790,7 +790,6 @@ public class Main
                     dashboard(member_id);
                     break;
                 case 3:
-                    System.out.println("got to here");
                     memberScheduling();
                     break;
                 default:
